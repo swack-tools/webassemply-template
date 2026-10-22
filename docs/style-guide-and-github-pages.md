@@ -97,12 +97,20 @@ The documentation site in `docs/` is built with [MkDocs Material](https://squidf
 
 ### Step 1 for configuring repository settings on `GitHub`
 
+To allow operators to bootstrap new projects from this repository with one click, open **Settings > General** on GitHub and enable **Template repository**. Once enabled, the repository displays the **Public template** badge and the **Use this template** button on its main page:
+
+![GitHub template repository landing page with Use this template button](assets/images/01-github-template-repo.png)
+
+![GitHub repository settings with Template repository enabled](assets/images/02-github-settings-template.png)
+
 When you create a new repository from this template, enable GitHub Actions deployment for GitHub Pages:
 
 1. Open your repository on GitHub and navigate to **Settings** > **Pages**.
-2. Under **Build and deployment**, set **Source** to **GitHub Actions**.
+2. Set **Build and deployment > Source** to **GitHub Actions** and select **Enforce HTTPS**.
 3. Navigate to **Settings** > **Environments** and select the `github-pages` environment.
 4. Restrict **Deployment branches and tags** to the `main` branch so pull request builds cannot publish to production Pages.
+
+![GitHub Pages build and deployment settings configured for GitHub Actions](assets/images/03-github-pages-settings.png)
 
 Or configure GitHub Pages from the command line with `gh`:
 
@@ -155,6 +163,14 @@ The `.github/workflows/docs.yml` workflow implements a hardened two-job pipeline
    - Requests `pages: write` and `id-token: write` permissions scoped to the `github-pages` environment and publishes the artifact with `actions/deploy-pages`.
 4. **Commit-`SHA` action pinning**:
    - Every GitHub Action in `.github/workflows/docs.yml` (`actions/checkout`, `actions/configure-pages`, `actions/upload-pages-artifact`, and `actions/deploy-pages`) is pinned to an immutable 40-character commit `SHA` rather than a mutable tag.
+
+Open the **Actions** tab on GitHub to verify that both the `CI` workflow (Rust tests and Vale prose checks) and the `Documentation` workflow complete with green checkmarks:
+
+![GitHub Actions CI and Documentation workflow runs](assets/images/04-github-actions-workflows.png)
+
+Once the `Documentation` workflow finishes, visit `https://swack-tools.github.io/webassemply-template/` (or your repository's Pages URL) to browse the published MkDocs Material site:
+
+![Published MkDocs Material documentation site on GitHub Pages](assets/images/05-mkdocs-live-site.png)
 
 ### Step 5 for keeping public `GitHub Pages` content free of secrets
 

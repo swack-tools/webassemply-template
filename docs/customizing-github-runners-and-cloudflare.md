@@ -26,14 +26,20 @@ wrangler login
 export CLOUDFLARE_ACCOUNT_ID="your-cloudflare-account-id"
 ```
 
-Create the production and preview Workers `KV` namespaces:
+In the Cloudflare dashboard, navigate to **Compute > Workers & Pages** to review your account overview and daily request quotas before creating the Worker:
+
+![Cloudflare Workers and Pages account overview](assets/images/06-cloudflare-workers-overview.png)
+
+Create the production and preview Workers `KV` namespaces from the command line, or select **Storage & databases > Workers KV > Create a KV namespace** in the Cloudflare dashboard:
 
 ```bash
 wrangler kv namespace create STATE_KV
 wrangler kv namespace create STATE_KV --preview
 ```
 
-Copy the namespace identifier returned by Wrangler and replace `REPLACE_WITH_KV_NAMESPACE_ID` in `cloudflare/wrangler.toml`:
+![Cloudflare Workers KV namespaces list with redacted namespace identifiers](assets/images/07-cloudflare-kv-namespaces.png)
+
+Copy the namespace identifier returned by Wrangler (or shown in the **Workers KV** table) and replace `REPLACE_WITH_KV_NAMESPACE_ID` in `cloudflare/wrangler.toml`:
 
 ```toml
 name = "cf-worker-kv-template"
@@ -61,7 +67,15 @@ crons = ["*/5 * * * *"]
 enabled = true
 ```
 
+When you open the namespace under **Storage & databases > Workers KV** and select the **KV Pairs** tab, you can inspect the consolidated state entry (`app:state`) and lease key (`app:lease`) stored in that namespace:
+
+![Cloudflare Workers KV namespace key explorer](assets/images/12-cloudflare-kv-namespace-keys.png)
+
 ### Step 2 for provisioning `Cloudflare` worker secrets
+
+First, register an OAuth 2.0 app on GitHub under `Settings > Developer Settings > OAuth Apps > New OAuth App` (or under your organization settings) and set the callback URL to `https://worker.example.com/auth/callback`:
+
+![GitHub Developer Settings OAuth 2.0 apps configuration](assets/images/14-github-oauth-settings.png)
 
 Never store secrets in `wrangler.toml` or commit them to Git. Provision each secret through `wrangler secret put`:
 
@@ -81,6 +95,10 @@ wrangler secret put GITHUB_RUNNER_TOKEN
 # Cloud provider service account JSON key for fleet reconciliation
 wrangler secret put GCP_SERVICE_ACCOUNT_KEY
 ```
+
+In the Cloudflare dashboard, open your Worker and navigate to **Settings > Variables and secrets** to confirm that sensitive values appear as `Value encrypted` alongside your plain-text runtime variables (`GITHUB_ORG`, `SESSION_NOT_BEFORE`) and `STATE_KV` binding:
+
+![Cloudflare Worker runtime variables, encrypted secrets, and KV bindings](assets/images/09-cloudflare-worker-settings.png)
 
 ### Step 3 for verifying `KV` quota invariants before deploying
 
@@ -106,11 +124,27 @@ Deploy the compiled WebAssembly Worker to Cloudflare's edge network:
 cd cloudflare && wrangler deploy
 ```
 
-Verify the deployment by querying the read-only health endpoint:
+In the Cloudflare dashboard, open the **Domains** tab for your Worker to bind your production custom domain (such as `worker.example.com`) and verify that both the `*.workers.dev` route and preview URLs remain turned off (`workers_dev = false` and `preview_urls = false`):
+
+![Cloudflare Worker custom domains and turned-off workers.dev routes](assets/images/13-cloudflare-worker-domains.png)
+
+Open the **Deployments** tab to confirm that the latest Wrangler rollout serves 100% of production traffic and to inspect version rollout history:
+
+![Cloudflare Worker deployment rollout history](assets/images/10-cloudflare-worker-deployments.png)
+
+Select the **Metrics** tab to monitor live edge invocations, subrequests, error rates, and median `CPU` execution time:
+
+![Cloudflare Worker live edge metrics and CPU time](assets/images/08-cloudflare-worker-metrics.png)
+
+Verify the deployment from the command line by querying the read-only health endpoint:
 
 ```bash
 curl -sS https://your-worker-domain.example.com/api/health | jq .
 ```
+
+Finally, open `https://worker.example.com/` in your browser to inspect the embedded pure-Rust edge web interface hydrated directly from the single consolidated `STATE_KV` state bundle:
+
+![Live pure-Rust Cloudflare Worker control plane web interface](assets/images/11-live-edge-worker-dashboard.png)
 
 ## Part 2 for customizing `GitHub Actions` runners for `swack-tools`
 

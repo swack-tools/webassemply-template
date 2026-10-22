@@ -32,3 +32,13 @@ cd cloudflare && worker-build --release && cd ..
 vale sync
 vale README.md AGENTS.md CLAUDE.md GEMINI.md docs/*.md
 ```
+
+## Visual walkthrough preview
+
+See [Customize GitHub runners and Cloudflare](customizing-github-runners-and-cloudflare.md) and [Style guide and GitHub Pages setup](style-guide-and-github-pages.md) for the complete 14-screenshot visual configuration runbook:
+
+![Cloudflare Workers KV namespaces list](assets/images/07-cloudflare-kv-namespaces.png)
+
+![Cloudflare Worker runtime variables and encrypted secrets](assets/images/09-cloudflare-worker-settings.png)
+
+![Live pure-Rust Cloudflare Worker control plane web interface](assets/images/11-live-edge-worker-dashboard.png)

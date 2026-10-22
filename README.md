@@ -72,6 +72,26 @@ vale sync
 vale README.md AGENTS.md CLAUDE.md GEMINI.md docs/*.md
 ```
 
+## Visual configuration walkthrough
+
+See [Customize GitHub runners for swack-tools and create the Cloudflare control plane](docs/customizing-github-runners-and-cloudflare.md) and [Style guide and GitHub Pages setup](docs/style-guide-and-github-pages.md) for all 14 step-by-step screenshots with sensitive identifiers scrubbed:
+
+1. **Create and bind the `STATE_KV` namespace (`Storage & databases > Workers KV`)**:
+
+   ![Cloudflare Workers KV namespaces list](docs/assets/images/07-cloudflare-kv-namespaces.png)
+
+2. **Configure encrypted runtime secrets, variables, and `KV` bindings (`Settings > Variables and secrets`)**:
+
+   ![Cloudflare Worker runtime variables and encrypted secrets](docs/assets/images/09-cloudflare-worker-settings.png)
+
+3. **Bind a custom domain and turn off `workers.dev` preview URLs (`Domains`)**:
+
+   ![Cloudflare Worker custom domains and turned-off workers.dev routes](docs/assets/images/13-cloudflare-worker-domains.png)
+
+4. **Inspect the live pure-Rust edge Worker dashboard hydrated from `STATE_KV`**:
+
+   ![Live pure-Rust Cloudflare Worker control plane web interface](docs/assets/images/11-live-edge-worker-dashboard.png)
+
 ## Documentation map
 
 - [Documentation home](docs/index.md)
