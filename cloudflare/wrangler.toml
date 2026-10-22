@@ -1,0 +1,34 @@
+# Pure-Rust Cloudflare Worker backed by Cloudflare Workers KV (`STATE_KV`).
+#
+# Before deploying:
+#   1. Create the KV namespace (`wrangler kv namespace create STATE_KV`) and replace
+#      REPLACE_WITH_KV_NAMESPACE_ID below with the returned namespace ID.
+#   2. Provision Worker secrets (never commit secrets in wrangler.toml):
+#        wrangler secret put SESSION_SECRET
+#        wrangler secret put GITHUB_OAUTH_CLIENT_ID
+#        wrangler secret put GITHUB_OAUTH_CLIENT_SECRET
+#   3. Export CLOUDFLARE_ACCOUNT_ID in the deploying shell.
+
+name = "cf-worker-kv-template"
+main = "build/worker/shim.mjs"
+compatibility_date = "2026-06-01"
+workers_dev = false
+preview_urls = false
+
+kv_namespaces = [
+  { binding = "STATE_KV", id = "REPLACE_WITH_KV_NAMESPACE_ID" },
+]
+
+[build]
+command = "worker-build --release"
+
+[vars]
+SESSION_NOT_BEFORE = ""
+GITHUB_ORG = "swack-tools"
+DEFAULT_TARGET_REPO = "swack-tools/oxidex"
+
+[triggers]
+crons = ["*/5 * * * *"]
+
+[observability]
+enabled = true

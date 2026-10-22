@@ -1,0 +1,13 @@
+# Ignore build outputs, local secrets, and downloaded Vale styles
+/target/
+/cloudflare/target/
+/cloudflare/build/
+/cloudflare/.wrangler/
+/.wrangler/
+/.vale/styles/
+/site/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.swp
